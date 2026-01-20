@@ -44,95 +44,124 @@ export default function LoginPage() {
     }
   }
 
-  const handleGoogleLogin = async () => {
-    setLoading(true)
-    setError(null)
-
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/today`,
-        },
-      })
-      if (error) throw error
-    } catch (err: any) {
-      setError(err.message)
-      setLoading(false)
-    }
-  }
-
   if (!mounted) {
     return null
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
-      <div className="w-full max-w-md">
-        <div className="bg-card border border-border rounded-lg p-8">
-          <h1 className="text-2xl font-semibold mb-6 text-center">
-            {isLogin ? 'Entrar' : 'Registrarse'}
-          </h1>
+    <div className="min-h-screen bg-black flex flex-col">
+      {/* Header */}
+      <header className="flex items-center justify-between px-8 py-6">
+        <div className="flex items-center gap-2">
+          <div className="w-6 h-6 bg-emerald-500 rounded flex items-center justify-center">
+            <svg className="w-4 h-4 text-black" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M10 3.5L2 8v9l8 4.5 8-4.5V8l-8-4.5z"/>
+            </svg>
+          </div>
+          <span className="text-white font-semibold text-lg">LifeOS</span>
+        </div>
+        <button className="text-white text-sm hover:text-gray-300 transition-colors">
+          Join the Waitlist
+        </button>
+      </header>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="w-full px-4 py-3 bg-background border border-border rounded-lg focus:outline-none focus:border-accent text-text"
-              />
-            </div>
-
-            <div>
-              <input
-                type="password"
-                placeholder="Contraseña"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="w-full px-4 py-3 bg-background border border-border rounded-lg focus:outline-none focus:border-accent text-text"
-              />
-            </div>
-
-            {error && (
-              <p className="text-sm text-red-400">{error}</p>
-            )}
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3 bg-accent hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed rounded-lg font-medium transition-colors"
-            >
-              {loading ? 'Cargando...' : isLogin ? 'Entrar' : 'Crear cuenta'}
-            </button>
-          </form>
-
-          <div className="mt-4">
-            <button
-              onClick={handleGoogleLogin}
-              disabled={loading}
-              className="w-full py-3 bg-background border border-border hover:border-accent disabled:opacity-50 disabled:cursor-not-allowed rounded-lg font-medium transition-colors"
-            >
-              Continuar con Google
-            </button>
+      {/* Main Content */}
+      <div className="flex-1 flex items-center justify-center px-4">
+        <div className="w-full max-w-md">
+          {/* Title */}
+          <div className="text-center mb-12">
+            <h1 className="text-5xl font-bold text-white mb-2">LifeOS</h1>
+            <p className="text-gray-400 text-sm">Daily log</p>
           </div>
 
-          <div className="mt-6 text-center">
-            <button
-              onClick={() => {
-                setIsLogin(!isLogin)
-                setError(null)
-              }}
-              className="text-text-muted hover:text-text text-sm transition-colors"
-            >
-              {isLogin ? '¿No tienes cuenta? Regístrate' : '¿Ya tienes cuenta? Entra'}
-            </button>
+          {/* Form Card */}
+          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-8">
+            <form onSubmit={handleSubmit} className="space-y-5">
+              {/* Email Field */}
+              <div>
+                <label htmlFor="email" className="block text-gray-400 text-sm mb-2">
+                  Email address
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  placeholder="name@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-lg focus:outline-none focus:border-emerald-500 text-white placeholder-gray-500"
+                />
+              </div>
+
+              {/* Password Field */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label htmlFor="password" className="text-gray-400 text-sm">
+                    Password
+                  </label>
+                  <button
+                    type="button"
+                    className="text-gray-400 text-sm hover:text-gray-300 transition-colors"
+                  >
+                    Forgot?
+                  </button>
+                </div>
+                <input
+                  id="password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-lg focus:outline-none focus:border-emerald-500 text-white placeholder-gray-500"
+                />
+              </div>
+
+              {error && (
+                <p className="text-sm text-red-400">{error}</p>
+              )}
+
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-3 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg font-medium text-black transition-colors"
+              >
+                {loading ? 'Loading...' : isLogin ? 'Sign in' : 'Create account'}
+              </button>
+            </form>
+
+            {/* Toggle Login/Signup */}
+            <div className="mt-6 text-center">
+              <span className="text-gray-400 text-sm">
+                {isLogin ? 'New here? ' : 'Already have an account? '}
+              </span>
+              <button
+                onClick={() => {
+                  setIsLogin(!isLogin)
+                  setError(null)
+                }}
+                className="text-white text-sm hover:text-gray-300 transition-colors"
+              >
+                {isLogin ? 'Create an account' : 'Sign in'}
+              </button>
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Footer */}
+      <footer className="px-8 py-6 flex items-center justify-center gap-6">
+        <a href="#" className="text-gray-500 text-xs hover:text-gray-400 transition-colors uppercase tracking-wide">
+          Privacy
+        </a>
+        <a href="#" className="text-gray-500 text-xs hover:text-gray-400 transition-colors uppercase tracking-wide">
+          Terms
+        </a>
+        <a href="#" className="text-gray-500 text-xs hover:text-gray-400 transition-colors uppercase tracking-wide">
+          Manifest
+        </a>
+      </footer>
     </div>
   )
 }
