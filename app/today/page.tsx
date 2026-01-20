@@ -153,6 +153,12 @@ export default function TodayPage() {
           <h1 className="text-2xl font-semibold">Hoy</h1>
           <div className="flex gap-4">
             <button
+              onClick={() => router.push('/calendar')}
+              className="text-text-muted hover:text-text transition-colors"
+            >
+              Calendario
+            </button>
+            <button
               onClick={() => router.push('/history')}
               className="text-text-muted hover:text-text transition-colors"
             >

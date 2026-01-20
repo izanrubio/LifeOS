@@ -90,12 +90,20 @@ export default function HistoryPage() {
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-2xl font-semibold">Historial</h1>
-          <button
-            onClick={() => router.push('/today')}
-            className="text-text-muted hover:text-text transition-colors"
-          >
-            Volver
-          </button>
+          <div className="flex gap-4">
+            <button
+              onClick={() => router.push('/calendar')}
+              className="text-text-muted hover:text-text transition-colors"
+            >
+              Calendario
+            </button>
+            <button
+              onClick={() => router.push('/today')}
+              className="text-text-muted hover:text-text transition-colors"
+            >
+              Volver
+            </button>
+          </div>
         </div>
 
         {/* Lista de días */}
