@@ -6,6 +6,15 @@ import { useRouter } from 'next/navigation'
 
 const MAX_TASKS = 12
 
+// Función para obtener la fecha local en formato YYYY-MM-DD
+const getLocalDate = () => {
+  const now = new Date()
+  const year = now.getFullYear()
+  const month = String(now.getMonth() + 1).padStart(2, '0')
+  const day = String(now.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
 export default function TodayPage() {
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
@@ -13,13 +22,28 @@ export default function TodayPage() {
   const [tasks, setTasks] = useState<Task[]>([])
   const [newTaskTitle, setNewTaskTitle] = useState('')
   const [note, setNote] = useState('')
+  const [currentDate, setCurrentDate] = useState(() => getLocalDate())
   const router = useRouter()
 
-  const today = new Date().toISOString().split('T')[0]
+  const today = currentDate
 
   useEffect(() => {
     checkUser()
   }, [])
+
+  useEffect(() => {
+    // Verificar cambio de día cada 30 segundos
+    const interval = setInterval(() => {
+      const newDate = getLocalDate()
+      if (newDate !== currentDate) {
+        console.log('Día cambiado de', currentDate, 'a', newDate)
+        setCurrentDate(newDate)
+        window.location.reload() // Forzar recarga completa
+      }
+    }, 30000) // Verificar cada 30 segundos
+    
+    return () => clearInterval(interval)
+  }, [currentDate])
 
   const checkUser = async () => {
     const { data: { user } } = await supabase.auth.getUser()
@@ -33,21 +57,28 @@ export default function TodayPage() {
   }
 
   const loadTodayData = async (userId: string) => {
+    // Asegurar que usamos la fecha local del sistema
+    const currentDateStr = getLocalDate()
+    console.log('Cargando datos para la fecha:', currentDateStr)
+    
     // Cargar entrada diaria
     let { data: entry } = await supabase
       .from('daily_entries')
       .select('*')
       .eq('user_id', userId)
-      .eq('date', today)
+      .eq('date', currentDateStr)
       .single()
+
+    console.log('Entrada encontrada:', entry)
 
     if (!entry) {
       // Crear entrada si no existe
+      console.log('Creando nueva entrada para:', currentDateStr)
       const { data: newEntry } = await supabase
         .from('daily_entries')
         .insert({
           user_id: userId,
-          date: today,
+          date: currentDateStr,
           energy_level: null,
           note: null,
         })
@@ -64,9 +95,10 @@ export default function TodayPage() {
       .from('tasks')
       .select('*')
       .eq('user_id', userId)
-      .eq('date', today)
+      .eq('date', currentDateStr)
       .order('created_at', { ascending: true })
 
+    console.log('Tareas encontradas para', currentDateStr, ':', tasksData)
     setTasks(tasksData || [])
   }
 
@@ -95,11 +127,14 @@ export default function TodayPage() {
     e.preventDefault()
     if (!user || !newTaskTitle.trim() || tasks.length >= MAX_TASKS) return
 
+    const currentDateStr = getLocalDate()
+    console.log('Añadiendo tarea para:', currentDateStr)
+
     const { data: newTask } = await supabase
       .from('tasks')
       .insert({
         user_id: user.id,
-        date: today,
+        date: currentDateStr,
         title: newTaskTitle.trim(),
         completed: false,
       })
@@ -144,7 +179,8 @@ export default function TodayPage() {
       month: 'long', 
       day: 'numeric'
     }
-    return date.toLocaleDateString('en-US', options).replace(',', '')
+    const formatted = date.toLocaleDateString('en-US', options)
+    return formatted.replace(/,/g, '')
   }
 
   if (loading) {

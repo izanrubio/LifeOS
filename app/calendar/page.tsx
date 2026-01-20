@@ -5,6 +5,15 @@ import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import './calendar.css'
 
+// Función para obtener la fecha local en formato YYYY-MM-DD
+const getLocalDate = () => {
+  const now = new Date()
+  const year = now.getFullYear()
+  const month = String(now.getMonth() + 1).padStart(2, '0')
+  const day = String(now.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
 interface DayData {
   date: string
   energy_level: 'low' | 'medium' | 'high' | null
@@ -16,6 +25,7 @@ interface DayData {
 export default function CalendarPage() {
   const [mounted, setMounted] = useState(false)
   const [currentDate, setCurrentDate] = useState(new Date())
+  const [todayDate, setTodayDate] = useState(() => getLocalDate())
   const [calendarData, setCalendarData] = useState<Map<string, DayData>>(new Map())
   const [selectedDay, setSelectedDay] = useState<DayData | null>(null)
   const [activeTab, setActiveTab] = useState<'month' | 'year' | 'insights'>('month')
@@ -26,6 +36,20 @@ export default function CalendarPage() {
     checkAuth()
     loadCalendarData()
   }, [currentDate])
+
+  useEffect(() => {
+    // Verificar cambio de día cada 30 segundos
+    const interval = setInterval(() => {
+      const newToday = getLocalDate()
+      if (newToday !== todayDate) {
+        console.log('Día cambiado en calendario de', todayDate, 'a', newToday)
+        setTodayDate(newToday)
+        loadCalendarData()
+      }
+    }, 30000)
+    
+    return () => clearInterval(interval)
+  }, [todayDate])
 
   const checkAuth = async () => {
     const { data: { session } } = await supabase.auth.getSession()
@@ -122,11 +146,12 @@ export default function CalendarPage() {
 
   const handleDayClick = (day: number) => {
     const dateStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
-    const today = new Date().toISOString().split('T')[0]
     
-    if (dateStr > today) return
+    console.log('Click en día:', dateStr, 'Hoy es:', todayDate)
     
-    if (dateStr === today) {
+    if (dateStr > todayDate) return
+    
+    if (dateStr === todayDate) {
       router.push('/today')
       return
     }
@@ -278,8 +303,7 @@ export default function CalendarPage() {
                   
                   const dateStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
                   const dayData = calendarData.get(dateStr)
-                  const today = new Date().toISOString().split('T')[0]
-                  const isToday = dateStr === today
+                  const isToday = dateStr === todayDate
                   const isSelected = selectedDay?.date === dateStr
                   
                   return (
