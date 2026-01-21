@@ -206,10 +206,49 @@ export default function CalendarPage() {
   const days = getDaysInMonth()
   const monthYear = currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
 
+  const handleLogout = async () => {
+    await supabase.auth.signOut()
+    router.push('/auth/login')
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-950 to-emerald-900 p-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-950 to-emerald-900 flex flex-col">
+      {/* Header */}
+      <header className="px-8 py-6 flex items-center justify-between border-b border-emerald-800/30">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center">
+            <svg className="w-5 h-5 text-emerald-950" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M10 3.5L2 8v9l8 4.5 8-4.5V8l-8-4.5z"/>
+            </svg>
+          </div>
+          <span className="text-white font-semibold text-lg">LifeOS</span>
+        </div>
+        
+        <nav className="flex items-center gap-6">
+          <button 
+            onClick={() => router.push('/today')}
+            className="text-emerald-300/70 hover:text-emerald-300 text-sm font-medium transition-colors"
+          >
+            Today
+          </button>
+          <button className="text-emerald-400 text-sm font-medium px-3 py-1.5 border-b-2 border-emerald-400">
+            Calendar
+          </button>
+          
+          <button 
+            onClick={handleLogout}
+            className="text-emerald-300/70 hover:text-emerald-300 transition-colors ml-4"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+          </button>
+        </nav>
+      </header>
+
+      <div className="flex-1 p-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Panel - Calendar */}
           <div className="lg:col-span-2">
             <div className="mb-8">
@@ -434,6 +473,7 @@ export default function CalendarPage() {
             )}
           </div>
         </div>
+      </div>
       </div>
     </div>
   )

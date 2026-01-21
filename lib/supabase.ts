@@ -13,6 +13,7 @@ export interface DailyEntry {
   date: string
   energy_level: EnergyLevel | null
   note: string | null
+  day_feeling: number | null
   created_at: string
 }
 

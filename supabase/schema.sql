@@ -11,6 +11,7 @@ create table daily_entries (
   date date not null,
   energy_level energy_level,
   note text,
+  day_feeling integer check (day_feeling >= 1 and day_feeling <= 10),
   created_at timestamp with time zone default now(),
   unique(user_id, date)
 );
